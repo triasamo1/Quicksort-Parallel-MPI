@@ -6,33 +6,22 @@
 #define SIZE 100000
 
 
-
-// returns the pivot index
-int partition(int *number,int first,int last){
-    int i,j, pivot, temp;
-    if(first<last){
-        pivot=last;
-        i=first;
-        j=last;
-        while(i<j){
-            while(number[i]<=number[pivot]&&i<last)
-                i++;
-            while(number[j]>number[pivot])
-                j--;
-            if(i<j){
-                //swap
-                temp=number[i];
-                number[i]=number[j];
-                number[j]=temp;
-            }
-        }
-        //swap
-        temp=number[pivot];
-        number[pivot]=number[j];
-        number[j]=temp;
-
-        return j;
+int partition(int *arr, int low, int high){
+    int pivot = arr[high];
+    int i = (low - 1);
+    int j,temp;
+    for (j=low;j<=high-1;j++){
+		if(arr[j] < pivot){
+			i++;
+			temp=arr[i]; 
+			arr[i]=arr[j];
+			arr[j]=temp;	
+		}
     }
+    temp=arr[i+1];  
+    arr[i+1]=arr[high];
+    arr[high]=temp; 
+    return (i+1);
 }
 
 void quicksort(int *number,int first,int last){
@@ -100,7 +89,6 @@ int main(int argc, char *argv[]) {
     	int j = 0;
     	for (j = 0; j < SIZE; ++j) {
         	unsorted_array[j] =(int) rand() % 1000;
-			//printf("%d ",unsorted_array[j]);
     	}
         printf("Created\n");
 	}
@@ -113,16 +101,13 @@ int main(int argc, char *argv[]) {
 		start=MPI_Wtime();
 		int i =0;
 		if(iter_count>1){
-			double start1;
-			start1=MPI_Wtime();
+
 			for(i=0;i<iter_count-1;i++){//=======================================SENDING DATA=======================================================
 				int j;
 				MPI_Send(&unsorted_array[(i+1)*sub_array_size],sub_array_size,MPI_INT,i+1,0,MPI_COMM_WORLD);//sends the sub array 
 
 			}//=======================================SENDING DATA END=======================================================
-			double end1;
-			end1=MPI_Wtime();
-			printf("execution time send : %1.2f sec\n",end1-start1);
+		
 			
 			int i =0;//*************************************Calculating First Sub Array ********************************
 			int *sub_array = (int *)malloc(sub_array_size*sizeof(int));
@@ -135,8 +120,7 @@ int main(int argc, char *argv[]) {
 			
 			for (i=0;i<iter_count;i++){
 				if(i>0){
-					double start2;
-					start2=MPI_Wtime();
+				
 					int temp_sub_array[sub_array_size];
 					MPI_Recv(temp_sub_array,sub_array_size,MPI_INT,i,666,MPI_COMM_WORLD,&status);//receive each subarray t
 					int j;
@@ -147,9 +131,7 @@ int main(int argc, char *argv[]) {
 					int temp_result_size = sub_array_size*i;
 
 					merge(temp_sub_array,temp_result,result,sub_array_size,temp_result_size);
-					double end2;
-					end2=MPI_Wtime();
-					printf("execution time recv merge : %1.2f sec\n",end2-start2);
+					
 					
 				}//endif i>0
 				else{//first iteration we just pass the sorted elements to the result array
@@ -171,10 +153,6 @@ int main(int argc, char *argv[]) {
 		double finish;
 		finish=MPI_Wtime();
 		printf("End Result: \n");
-		/*for(i=0;i<SIZE;i++){//prints the end result
-			//printf("%d ",result[i]);
-		}//endfor
-		*/
 		printf("execution time measured : %1.2f sec\n",finish-start);
 	}//end_if_rank==0
 
@@ -195,7 +173,6 @@ int main(int argc, char *argv[]) {
         bool error = false;
         int i=0;
         for(i=0;i<SIZE-1;i++) {
-            //printf("%d ",result[i]);
             if (result[i] > result[i+1]){
                 error = true;
         		printf("error in i=%d \n", i);
