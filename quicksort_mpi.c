@@ -30,6 +30,39 @@ int partition(int *arr, int low, int high){
 }
 
 /*
+    Hoare Partition - Starting pivot is the middle point
+    Divides the array given into two partitions
+        - Lower than pivot
+        - Higher than pivot
+    and returns the Pivot index in the array
+*/
+int hoare_partition(int *arr, int low, int high){
+    int middle = floor((low+high)/2);
+    int pivot = arr[middle];
+    int j,temp;
+    // move pivot to the end
+    temp=arr[middle];  
+    arr[middle]=arr[high];
+    arr[high]=temp;
+
+    int i = (low - 1);
+    for (j=low;j<=high-1;j++){
+        if(arr[j] < pivot){
+            i++;
+            temp=arr[i];  
+            arr[i]=arr[j];
+            arr[j]=temp;	
+        }
+    }
+    // move pivot back
+    temp=arr[i+1];  
+    arr[i+1]=arr[high];
+    arr[high]=temp; 
+
+    return (i+1);
+}
+
+/*
     Simple sequential Quicksort Algorithm
 */
 void quicksort(int *number,int first,int last){
@@ -60,7 +93,7 @@ int quicksort_recursive(int* arr, int arrSize, int currProcRank, int maxRank, in
     // Divide array in two parts with the pivot in between
     int j = 0;
     int pivotIndex;
-    pivotIndex = partition(arr, j, arrSize-1 );
+    pivotIndex = hoare_partition(arr, j, arrSize-1 );
 
     // Send partition based on size(always send the smaller part), 
     // Sort the remaining partitions,
