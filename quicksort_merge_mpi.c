@@ -11,6 +11,32 @@
         - Higher than pivot
     and returns the Pivot index in the array
 */
+int lomuto_partition(int *arr, int low, int high){
+    int pivot = arr[high];
+    int i = (low - 1);
+    int j,temp;
+    for (j=low;j<=high-1;j++){
+		if(arr[j] < pivot){
+			i++;
+			temp=arr[i]; 
+			arr[i]=arr[j];
+			arr[j]=temp;	
+		}
+    }
+    temp=arr[i+1];  
+    arr[i+1]=arr[high];
+    arr[high]=temp; 
+    return (i+1);
+}
+
+
+/*
+    Hoare Partition - Starting pivot is the middle point
+    Divides the array given into two partitions
+        - Lower than pivot
+        - Higher than pivot
+    and returns the Pivot index in the array
+*/
 int hoare_partition(int *arr, int low, int high){
     int middle = floor((low+high)/2);
     int pivot = arr[middle];
@@ -36,30 +62,14 @@ int hoare_partition(int *arr, int low, int high){
 
     return (i+1);
 }
-int partition(int *arr, int low, int high){
-    int pivot = arr[high];
-    int i = (low - 1);
-    int j,temp;
-    for (j=low;j<=high-1;j++){
-		if(arr[j] < pivot){
-			i++;
-			temp=arr[i]; 
-			arr[i]=arr[j];
-			arr[j]=temp;	
-		}
-    }
-    temp=arr[i+1];  
-    arr[i+1]=arr[high];
-    arr[high]=temp; 
-    return (i+1);
-}
+
 
 /*
     Simple sequential Quicksort Algorithm
 */
 void quicksort(int *number,int first,int last){
     if(first<last){
-        int pivot_index = partition(number, first, last);
+        int pivot_index = hoare_partition(number, first, last);
         quicksort(number,first,pivot_index-1);
         quicksort(number,pivot_index+1,last);
     }
@@ -120,7 +130,7 @@ int main(int argc, char *argv[]) {
     
     if(rank==0){
     	// --- RANDOM ARRAY GENERATION ---
-    	printf("Creating Random List of 100 elements\n");
+    	printf("Creating Random List of %d elements\n", SIZE);
     	int j = 0;
     	for (j = 0; j < SIZE; ++j) {
         	unsorted_array[j] =(int) rand() % 1000;
@@ -135,8 +145,8 @@ int main(int argc, char *argv[]) {
 
 	// Cluster 0 (Master) splits the array and sends each subarray to the respective machine
 	if( rank == 0 ){
-		double start;
-		start=MPI_Wtime();
+		double start_timer;
+		start_timer=MPI_Wtime();
 		int i =0;
 		if(iter_count > 1){
 			// ==============================================SENDING DATA==============================================
@@ -161,7 +171,7 @@ int main(int argc, char *argv[]) {
 				if(i > 0){				
 					int temp_sub_array[sub_array_size];
 					// Receive each subarray
-					MPI_Recv(temp_sub_array,sub_array_size,MPI_INT,i,66,MPI_COMM_WORLD,&status);
+					MPI_Recv(temp_sub_array,sub_array_size,MPI_INT,i,666,MPI_COMM_WORLD,&status);
 					int j;
 					int temp_result[i*sub_array_size];
 					for(j=0;j<i*sub_array_size;j++){
@@ -187,10 +197,10 @@ int main(int argc, char *argv[]) {
 				result[i]=unsorted_array[i];
 			}
 		}
-		double finish;
-		finish=MPI_Wtime();
+		double finish_timer;
+		finish_timer=MPI_Wtime();
 		printf("End Result: \n");
-		printf("execution time measured : %1.2f sec\n",finish-start);
+		printf("Cluster Size %d, execution time measured : %2.7f sec \n",size, finish_timer-start_timer);
 	}else{
 		// All the other Clsuters have to sort the data and send it back
 		sub_array_size=(int)SIZE/iter_count;
