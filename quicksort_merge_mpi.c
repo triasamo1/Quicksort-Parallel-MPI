@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 				if(i > 0){				
 					int temp_sub_array[sub_array_size];
 					// Receive each subarray
-					MPI_Recv(temp_sub_array,sub_array_size,MPI_INT,i,666,MPI_COMM_WORLD,&status);
+					MPI_Recv(temp_sub_array,sub_array_size,MPI_INT,i,777,MPI_COMM_WORLD,&status);
 					int j;
 					int temp_result[i*sub_array_size];
 					for(j=0;j<i*sub_array_size;j++){
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
 		MPI_Recv(sub_array,sub_array_size,MPI_INT,0,0,MPI_COMM_WORLD,&status);	
 		quicksort(sub_array,0,sub_array_size-1);
 		int i=0;
-		MPI_Send(sub_array,sub_array_size,MPI_INT,0,666,MPI_COMM_WORLD);//sends the data back to rank 0	
+		MPI_Send(sub_array,sub_array_size,MPI_INT,0,777,MPI_COMM_WORLD);//sends the data back to rank 0	
 		free(sub_array);
 	}
 
