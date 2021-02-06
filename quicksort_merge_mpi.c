@@ -5,30 +5,6 @@
 #include <stdbool.h>
 #define SIZE 1000000
 
-/*
-    Divides the array given into two partitions
-        - Lower than pivot
-        - Higher than pivot
-    and returns the Pivot index in the array
-*/
-int lomuto_partition(int *arr, int low, int high){
-    int pivot = arr[high];
-    int i = (low - 1);
-    int j,temp;
-    for (j=low;j<=high-1;j++){
-		if(arr[j] < pivot){
-			i++;
-			temp=arr[i]; 
-			arr[i]=arr[j];
-			arr[j]=temp;	
-		}
-    }
-    temp=arr[i+1];  
-    arr[i+1]=arr[high];
-    arr[high]=temp; 
-    return (i+1);
-}
-
 
 /*
     Hoare Partition - Starting pivot is the middle point
